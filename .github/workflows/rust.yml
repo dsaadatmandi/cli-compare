@@ -32,12 +32,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build
-      run: cargo build --verbose --release
+      run: cargo build --verbose --release --target ${{ matrix.target }}
 
     - name: List build output
       run: ls -R target/
       shell: bash
-      
+
     - uses: actions/upload-artifact@v4
       with:
         name: cli-compare-${{ matrix.target }}
