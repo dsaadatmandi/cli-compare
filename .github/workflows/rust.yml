@@ -30,3 +30,7 @@ jobs:
     - name: Build
       run: cargo build --verbose --release
 
+    - uses: actions/upload-artifact@v4
+      with:
+        name: cli-compare-${{ matrix.target }}
+        path: target/${{ matrix.target }}/release/cli-compare.*
