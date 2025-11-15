@@ -1,11 +1,12 @@
 use std::{collections::HashSet, env, fs, path::PathBuf, process::exit};
-
+use rayon::prelude::*;
 
 fn help() {
     println!("usage: cli-compare full_dataset_path to_check_dataset_path not_found_path [default]")
 }
 
 fn main() {
+    let time = std::time::Instant::now();
     let args: Vec<String> = env::args().collect();
 
     if args.len() != 5 {
@@ -26,13 +27,15 @@ fn main() {
         }
     }
 
+    println!("Time elapsed: {:?} ms", time.elapsed().as_millis())
+
 }
 
 fn standard_compare(fp: PathBuf, p2c: PathBuf, out: PathBuf) {
     let full_set = fs::read_to_string(fp).expect("Could not load full set file");
     println!("Loaded full dataset from disk");
     let full_set_hs: HashSet<&str> = full_set
-    .lines()
+    .par_lines()
     .map(|s| s.trim())
     .collect();
     println!("Created HashSet from dataset");
@@ -41,7 +44,7 @@ fn standard_compare(fp: PathBuf, p2c: PathBuf, out: PathBuf) {
     println!("Loaded set to check to memory");
     
     let not_found_set: Vec<&str> = check_set
-    .lines()
+    .par_lines()
     .map(|e| e.trim())
     .filter(|e| !full_set_hs.contains(e))
     .collect();
@@ -54,6 +57,3 @@ fn standard_compare(fp: PathBuf, p2c: PathBuf, out: PathBuf) {
 
 }
 
-// fn fast_compare() {
-
-// }
