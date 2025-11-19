@@ -34,10 +34,24 @@ jobs:
       run: ls -R target/
       shell: bash
 
+    - name: Create zip for Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd target/${{ matrix.target }}/release
+        7z a cli-compare_windows.zip cli-compare.exe
+      shell: bash
+
     - uses: actions/upload-artifact@v4
+      if: matrix.os != 'windows-latest'
       with:
         name: cli-compare_${{ matrix.os }}
-        path: target/${{ matrix.target }}/release/cli-compare_${{ matrix.os }}
+        path: target/${{ matrix.target }}/release/cli-compare${{ matrix.binary_extn }}
+
+    - uses: actions/upload-artifact@v4
+      if: matrix.os == 'windows-latest'
+      with:
+        name: cli-compare_${{ matrix.os }}
+        path: target/${{ matrix.target }}/release/cli-compare_windows.zip
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
