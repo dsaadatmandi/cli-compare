@@ -63,9 +63,34 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
-      
+
+      - name: Generate checksums
+        run: |
+          cd artifacts
+          find . -type f -exec sha256sum {} \; > ../SHA256SUMS.txt
+          cd ..
+          cat SHA256SUMS.txt
+        shell: bash
+
       - uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: |
+            artifacts/**/*
+            SHA256SUMS.txt
           draft: false
           prerelease: false
+          body: |
+            ## Installation
+
+            ### Using Cargo (Recommended)
+            ```bash
+            cargo install --git https://github.com/${{ github.repository }}
+            ```
+
+            ### Pre-built Binaries
+            Download the appropriate binary for your platform below.
+
+            ### Verify Download (Optional)
+            ```bash
+            sha256sum -c SHA256SUMS.txt
+            ```
